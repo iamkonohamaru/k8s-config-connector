@@ -1,13 +1,12 @@
 # KMSKeyHandle template
-# Replace ${PROJECT_ID}, ${LOCATION}, ${KEYRING}, and ${KEY}
-apiVersion: kms.cnrm.cloud.google.com/v1alpha1
+# Replace ${PROJECT_ID}, ${LOCATION}, and ${RESOURCE_TYPE}
+# ${RESOURCE_TYPE}: specify which resource types get auto-encrypted (e.g., compute.googleapis.com/Disk)
+apiVersion: kms.cnrm.cloud.google.com/v1beta1
 kind: KMSKeyHandle
 metadata:
   name: kmskeyhandle-sample
 spec:
-  keyRef:
-    external: "projects/${PROJECT_ID}/locations/${LOCATION}/keyRings/${KEYRING}/cryptoKeys/${KEY}"
-  # Optional: If you want the keyhandle data stored in a Kubernetes Secret
-  # secretRef:
-  #   name: my-keyhandle-secret
-  #   namespace: default
+  location: ${LOCATION}
+  projectRef:
+    external: "projects/${PROJECT_ID}"
+  resourceTypeSelector: ${RESOURCE_TYPE}
