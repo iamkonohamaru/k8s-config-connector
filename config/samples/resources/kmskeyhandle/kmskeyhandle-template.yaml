@@ -1,0 +1,13 @@
+# KMSKeyHandle template
+# Replace ${PROJECT_ID}, ${LOCATION}, ${KEYRING}, and ${KEY}
+apiVersion: kms.cnrm.cloud.google.com/v1alpha1
+kind: KMSKeyHandle
+metadata:
+  name: kmskeyhandle-sample
+spec:
+  keyRef:
+    external: "projects/${PROJECT_ID}/locations/${LOCATION}/keyRings/${KEYRING}/cryptoKeys/${KEY}"
+  # Optional: If you want the keyhandle data stored in a Kubernetes Secret
+  # secretRef:
+  #   name: my-keyhandle-secret
+  #   namespace: default
