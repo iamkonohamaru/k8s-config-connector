@@ -143,7 +143,7 @@ func (a *Adapter) Update(ctx context.Context, updateOp *directbase.UpdateOperati
 	log.V(2).Info("updating AutokeyConfig", "name", a.id)
 	mapCtx := &direct.MapContext{}
 
-	resource := KMSAutokeyConfig_FromFields(mapCtx, a.id, a.desiredKeyProject)
+	resource := KMSAutokeyConfig_FromFields(mapCtx, a.id, a.desiredKeyProject, a.desired.Spec.KeyProjectResolutionMode)
 	if mapCtx.Err() != nil {
 		return mapCtx.Err()
 	}
@@ -176,6 +176,9 @@ func (a *Adapter) updateAutokeyConfig(ctx context.Context, resource *kmspb.Autok
 	updateMask := &fieldmaskpb.FieldMask{}
 	if resource.KeyProject != "" && !reflect.DeepEqual(resource.KeyProject, a.actual.KeyProject) {
 		updateMask.Paths = append(updateMask.Paths, "key_project")
+	}
+	if resource.KeyProjectResolutionMode != a.actual.KeyProjectResolutionMode {
+		updateMask.Paths = append(updateMask.Paths, "key_project_resolution_mode")
 	}
 
 	if len(updateMask.Paths) == 0 {
