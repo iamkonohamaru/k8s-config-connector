@@ -153,7 +153,7 @@ func (a *Adapter) Update(ctx context.Context, updateOp *directbase.UpdateOperati
 
 	req := &kmspb.UpdateAutokeyConfigRequest{
 		AutokeyConfig: resource,
-		UpdateMask:   &fieldmaskpb.FieldMask{Paths: updateMask},
+		UpdateMask:    &fieldmaskpb.FieldMask{Paths: updateMask},
 	}
 
 	op, err := a.gcpClient.UpdateAutokeyConfig(ctx, req)
