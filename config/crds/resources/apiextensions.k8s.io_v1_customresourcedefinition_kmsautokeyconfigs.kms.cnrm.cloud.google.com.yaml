@@ -285,6 +285,8 @@ spec:
                     description: The `namespace` field of a `Project` resource.
                     type: string
                 type: object
+              keyProjectResolutionMode:
+                type: string
             required:
             - folderRef
             type: object

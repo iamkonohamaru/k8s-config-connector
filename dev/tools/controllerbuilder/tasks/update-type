@@ -36,7 +36,7 @@ if [[ -z "${OUTPUT:-}" ]]; then
   OUTPUT="${REPO_ROOT}/.generate"
 fi
 
-go run . prompt --src-dir="${REPO_ROOT}" --proto-dir="${REPO_ROOT}/dev/tools/proto-to-mapper/third_party/googleapis/" --output=${OUTPUT} <<EOF
+go run . prompt --src-dir="${REPO_ROOT}" --output=${OUTPUT} <<EOF
 // +kcc:proto=${PROTO}
 EOF
 
