@@ -31,6 +31,8 @@ func repositoryFuzzer() fuzztesting.KRMFuzzer {
 	)
 
 	fuzzer.UnimplementedFields.Insert(".name")
+	fuzzer.UnimplementedFields.Insert(".team_folder_name")
+	fuzzer.UnimplementedFields.Insert(".containing_folder")
 	fuzzer.UnimplementedFields.Insert(".labels")
 	fuzzer.UnimplementedFields.Insert(".git_remote_settings.token_status") // not supported by KCC anymore
 	fuzzer.UnimplementedFields.Insert(".create_time")
