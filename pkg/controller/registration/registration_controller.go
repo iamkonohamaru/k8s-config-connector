@@ -110,16 +110,16 @@ func AddDefaultControllers(ctx context.Context, mgr manager.Manager, rd *control
 		ccSettings = cc.Spec.Experiments.ResourceSettings
 	}
 
-	if (ccSettings == nil || ccSettings.Mode != operatorv1beta1.ResourceSettingsModeInclude) && (cccSettings != nil && cccSettings.Mode == operatorv1beta1.ResourceSettingsModeInclude) {
-		log.FromContext(ctx).Info("Warning: Inclusive mode enabled via ConfigConnectorContext, but ConfigConnector has no explicit ResourceSettings. Please update ConfigConnector to Inclusive mode for consistency.")
-	} else if (cccSettings == nil || cccSettings.Mode != operatorv1beta1.ResourceSettingsModeInclude) && (ccSettings != nil && ccSettings.Mode == operatorv1beta1.ResourceSettingsModeInclude) {
-		log.FromContext(ctx).Info("Warning: Inclusive mode enabled via ConfigConnector, but ConfigConnectorContext has no explicit ResourceSettings for this namespace. Please update ConfigConnectorContext to Inclusive mode for consistency.")
-	} else if ccSettings != nil && cccSettings != nil {
+	if ccSettings != nil && cccSettings != nil {
 		ccInclusive := ccSettings.Mode == operatorv1beta1.ResourceSettingsModeInclude
 		cccInclusive := cccSettings.Mode == operatorv1beta1.ResourceSettingsModeInclude
 		if ccInclusive != cccInclusive {
 			return fmt.Errorf("conflict: ConfigConnector and ConfigConnectorContext cannot mix inclusive (mode: include) and exclusive (mode: exclude) modes")
 		}
+	} else if (ccSettings == nil || ccSettings.Mode != operatorv1beta1.ResourceSettingsModeInclude) && (cccSettings != nil && cccSettings.Mode == operatorv1beta1.ResourceSettingsModeInclude) {
+		log.FromContext(ctx).Info("Warning: Inclusive mode enabled via ConfigConnectorContext, but ConfigConnector has no explicit ResourceSettings. Please update ConfigConnector to Inclusive mode for consistency.")
+	} else if (cccSettings == nil || cccSettings.Mode != operatorv1beta1.ResourceSettingsModeInclude) && (ccSettings != nil && ccSettings.Mode == operatorv1beta1.ResourceSettingsModeInclude) {
+		log.FromContext(ctx).Info("Warning: Inclusive mode enabled via ConfigConnector, but ConfigConnectorContext has no explicit ResourceSettings for this namespace. Please update ConfigConnectorContext to Inclusive mode for consistency.")
 	}
 
 	if err := add(mgr, rd,
