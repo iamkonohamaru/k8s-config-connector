@@ -96,6 +96,9 @@ func NetworkManagementConnectivityTestFuzzer() fuzztesting.KRMFuzzer {
 	f.Unimplemented_NotYetTriaged(".reachability_details.traces[].steps[].gke_network_policy_skipped")
 	f.Unimplemented_NotYetTriaged(".return_reachability_details.traces[].steps[].gke_network_policy_skipped")
 
+	f.Unimplemented_NotYetTriaged(".reachability_details.traces[].steps[].gke_network_policy.display_name")
+	f.Unimplemented_NotYetTriaged(".return_reachability_details.traces[].steps[].gke_network_policy.display_name")
+
 	f.Unimplemented_NotYetTriaged(".reachability_details.traces[].steps[].direct_vpc_egress_connection")
 	f.Unimplemented_NotYetTriaged(".return_reachability_details.traces[].steps[].direct_vpc_egress_connection")
 
