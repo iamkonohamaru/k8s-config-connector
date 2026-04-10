@@ -37,14 +37,14 @@ cd ${REPO_ROOT}
 
 # Fix Value conversion (byte[] <-> string mismatch) in mapper.generated.go
 # FromProto: generated code uses direct.LazyPtr(in.GetValue()) or in.GetValue(), we want string(in.GetValue())
-perl -i -pe 's/out.Value = direct.LazyPtr\(in.GetValue\(\)\)/out.Value = string\(in.GetValue\(\)\)/g' pkg/controller/direct/privateca/mapper.generated.go
-perl -i -pe 's/out.Value = in.GetValue\(\)/out.Value = string\(in.GetValue\(\)\)/g' pkg/controller/direct/privateca/mapper.generated.go
+sed -i 's/out.Value = direct.LazyPtr(in.GetValue())/out.Value = string(in.GetValue())/g' pkg/controller/direct/privateca/mapper.generated.go
+sed -i 's/out.Value = in.GetValue()/out.Value = string(in.GetValue())/g' pkg/controller/direct/privateca/mapper.generated.go
 
 # ToProto: generated code uses in.Value, we want []byte(in.Value)
-perl -i -pe 's/out.Value = in.Value/out.Value = \[\]byte\(in.Value\)/g' pkg/controller/direct/privateca/mapper.generated.go
+sed -i 's/out.Value = in.Value/out.Value = []byte(in.Value)/g' pkg/controller/direct/privateca/mapper.generated.go
 
 # Remove ZeroMaxIssuerPathLength mapping if generated (SDK mismatch)
-perl -i -ne 'print unless /ZeroMaxIssuerPathLength/' pkg/controller/direct/privateca/mapper.generated.go
+sed -i '/ZeroMaxIssuerPathLength/d' pkg/controller/direct/privateca/mapper.generated.go
 
 dev/tasks/generate-crds
 

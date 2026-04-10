@@ -19,7 +19,7 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "${REPO_ROOT}"
 
 make fmt
-changed_file_count=$(git diff --name-only | wc -l | xargs)
+changed_file_count=$(git diff --name-only | wc -l)
 if [[ "${changed_file_count}" != "0" ]]; then
     echo "Full diff:"
     git diff
@@ -30,7 +30,7 @@ if [[ "${changed_file_count}" != "0" ]]; then
     exit 1
 fi
 make generate
-changed_file_count=$(git diff --name-only | wc -l | xargs)
+changed_file_count=$(git diff --name-only | wc -l)
 if [[ "${changed_file_count}" != "0" ]]; then
     echo "Full diff:"
     git diff
@@ -41,8 +41,8 @@ if [[ "${changed_file_count}" != "0" ]]; then
     exit 1
 fi
 make manifests
-changed_file_count=$(git diff --name-only | wc -l | xargs)
-added_config_file_count=$(git ls-files --others --exclude-standard config/ | wc -l | xargs)
+changed_file_count=$(git diff --name-only | wc -l)
+added_config_file_count=$(git ls-files --others --exclude-standard config/ | wc -l)
 if [[ "${changed_file_count}" != "0" ]] || [[ "${added_config_file_count}" != "0" ]]; then
     echo "Full diff:"
     git diff
@@ -56,8 +56,8 @@ fi
 
 <<'###issues/3037: Drop problematic go-client check from PRESUBMIT'
 make generate-go-client
-changed_file_count=$(git diff --name-only | wc -l | xargs)
-added_go_client_file_count=$(git ls-files --others --exclude-standard pkg/clients/generated/ | wc -l | xargs)
+changed_file_count=$(git diff --name-only | wc -l)
+added_go_client_file_count=$(git ls-files --others --exclude-standard pkg/clients/generated/ | wc -l)
 if [[ "${changed_file_count}" != "0" ]] || [[ "${added_go_client_file_count}" != "0" ]]; then
     echo "Full diff:"
     git diff
@@ -75,7 +75,7 @@ make ensure
 if [[ $? -ne 0 ]]; then
   echo "'make ensure' failed. Please validate the override patch files."
 fi
-changed_file_count=$(git diff --name-only | wc -l | xargs)
+changed_file_count=$(git diff --name-only | wc -l)
 if [[ "${changed_file_count}" != "0" ]]; then
     echo "Full diff:"
     git diff
