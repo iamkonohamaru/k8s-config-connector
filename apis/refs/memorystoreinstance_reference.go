@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package v1alpha1
+package refs
 
 import (
 	"context"
@@ -22,36 +22,43 @@ import (
 	"github.com/GoogleCloudPlatform/k8s-config-connector/pkg/k8s"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-var _ refsv1beta1.ExternalNormalizer = &ApiRef{}
+var memorystoreInstanceGVK = schema.GroupVersionKind{
+	Group:   "memorystore.cnrm.cloud.google.com",
+	Version: "v1beta1",
+	Kind:    "MemorystoreInstance",
+}
 
-// ApiRef defines the resource reference to APIGatewayAPI, which "External" field
+var _ refsv1beta1.ExternalNormalizer = &MemorystoreInstanceRef{}
+
+// MemorystoreInstanceRef defines the resource reference to MemorystoreInstance, which "External" field
 // holds the GCP identifier for the KRM object.
-type ApiRef struct {
-	// A reference to an externally managed APIGatewayAPI resource.
-	// Should be in the format "projects/{{projectID}}/locations/global/apis/{{apiID}}".
+type MemorystoreInstanceRef struct {
+	// A reference to an externally managed MemorystoreInstance resource.
+	// Should be in the format "projects/{{projectID}}/locations/{{location}}/instances/{{instanceID}}".
 	External string `json:"external,omitempty"`
 
-	// The name of a APIGatewayAPI resource.
+	// The name of a MemorystoreInstance resource.
 	Name string `json:"name,omitempty"`
 
-	// The namespace of a APIGatewayAPI resource.
+	// The namespace of a MemorystoreInstance resource.
 	Namespace string `json:"namespace,omitempty"`
 }
 
-// NormalizedExternal provision the "External" value for other resource that depends on APIGatewayAPI.
-// If the "External" is given in the other resource's spec.APIGatewayAPIRef, the given value will be used.
-// Otherwise, the "Name" and "Namespace" will be used to query the actual APIGatewayAPI object from the cluster.
-func (r *ApiRef) NormalizedExternal(ctx context.Context, reader client.Reader, otherNamespace string) (string, error) {
+// NormalizedExternal provision the "External" value for other resource that depends on MemorystoreInstance.
+// If the "External" is given in the other resource's spec.MemorystoreInstanceRef, the given value will be used.
+// Otherwise, the "Name" and "Namespace" will be used to query the actual MemorystoreInstance object from the cluster.
+func (r *MemorystoreInstanceRef) NormalizedExternal(ctx context.Context, reader client.Reader, otherNamespace string) (string, error) {
 	if r.External != "" && r.Name != "" {
-		return "", fmt.Errorf("cannot specify both name and external on %s reference", APIGatewayAPIGVK.Kind)
+		return "", fmt.Errorf("cannot specify both name and external on %s reference", memorystoreInstanceGVK.Kind)
 	}
 	// From given External
 	if r.External != "" {
-		if _, _, err := ParseApiExternal(r.External); err != nil {
+		if _, _, err := ParseInstanceExternal(r.External); err != nil {
 			return "", err
 		}
 		return r.External, nil
@@ -63,12 +70,12 @@ func (r *ApiRef) NormalizedExternal(ctx context.Context, reader client.Reader, o
 	}
 	key := types.NamespacedName{Name: r.Name, Namespace: r.Namespace}
 	u := &unstructured.Unstructured{}
-	u.SetGroupVersionKind(APIGatewayAPIGVK)
+	u.SetGroupVersionKind(memorystoreInstanceGVK)
 	if err := reader.Get(ctx, key, u); err != nil {
 		if apierrors.IsNotFound(err) {
 			return "", k8s.NewReferenceNotFoundError(u.GroupVersionKind(), key)
 		}
-		return "", fmt.Errorf("reading referenced %s %s: %w", APIGatewayAPIGVK, key, err)
+		return "", fmt.Errorf("reading referenced %s %s: %w", memorystoreInstanceGVK, key, err)
 	}
 	// Get external from status.externalRef. This is the most trustworthy place.
 	actualExternalRef, _, err := unstructured.NestedString(u.Object, "status", "externalRef")

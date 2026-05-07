@@ -146,9 +146,19 @@ func (in *KMSAutokeyConfigSpec) DeepCopyInto(out *KMSAutokeyConfigSpec) {
 		*out = new(v1beta1.FolderRef)
 		**out = **in
 	}
+	if in.ProjectRef != nil {
+		in, out := &in.ProjectRef, &out.ProjectRef
+		*out = new(v1beta1.ProjectRef)
+		**out = **in
+	}
 	if in.KeyProjectRef != nil {
 		in, out := &in.KeyProjectRef, &out.KeyProjectRef
 		*out = new(v1beta1.ProjectRef)
+		**out = **in
+	}
+	if in.KeyProjectResolutionMode != nil {
+		in, out := &in.KeyProjectResolutionMode, &out.KeyProjectResolutionMode
+		*out = new(string)
 		**out = **in
 	}
 }

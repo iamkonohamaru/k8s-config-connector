@@ -64,6 +64,7 @@ spec:
             properties:
               folderRef:
                 description: Immutable. The folder that this resource belongs to.
+                  Exactly one of folderRef or projectRef must be specified.
                 oneOf:
                 - not:
                     required:
@@ -126,8 +127,48 @@ spec:
                     description: The `namespace` field of a `Project` resource.
                     type: string
                 type: object
-            required:
-            - folderRef
+              keyProjectResolutionMode:
+                description: How Autokey determines which key project to use when
+                  provisioning CMEK keys.
+                enum:
+                - KEY_PROJECT_RESOLUTION_MODE_UNSPECIFIED
+                - DEDICATED_KEY_PROJECT
+                - RESOURCE_PROJECT
+                - DISABLED
+                type: string
+              projectRef:
+                description: Immutable. The project that this resource belongs to.
+                  Exactly one of folderRef or projectRef must be specified.
+                oneOf:
+                - not:
+                    required:
+                    - external
+                  required:
+                  - name
+                - not:
+                    anyOf:
+                    - required:
+                      - name
+                    - required:
+                      - namespace
+                  required:
+                  - external
+                properties:
+                  external:
+                    description: The `projectID` field of a project, when not managed
+                      by Config Connector.
+                    type: string
+                  kind:
+                    description: The kind of the Project resource; optional but must
+                      be `Project` if provided.
+                    type: string
+                  name:
+                    description: The `name` field of a `Project` resource.
+                    type: string
+                  namespace:
+                    description: The `namespace` field of a `Project` resource.
+                    type: string
+                type: object
             type: object
           status:
             description: KMSAutokeyConfigStatus defines the config connector machine
@@ -223,6 +264,7 @@ spec:
             properties:
               folderRef:
                 description: Immutable. The folder that this resource belongs to.
+                  Exactly one of folderRef or projectRef must be specified.
                 oneOf:
                 - not:
                     required:
@@ -285,8 +327,48 @@ spec:
                     description: The `namespace` field of a `Project` resource.
                     type: string
                 type: object
-            required:
-            - folderRef
+              keyProjectResolutionMode:
+                description: How Autokey determines which key project to use when
+                  provisioning CMEK keys.
+                enum:
+                - KEY_PROJECT_RESOLUTION_MODE_UNSPECIFIED
+                - DEDICATED_KEY_PROJECT
+                - RESOURCE_PROJECT
+                - DISABLED
+                type: string
+              projectRef:
+                description: Immutable. The project that this resource belongs to.
+                  Exactly one of folderRef or projectRef must be specified.
+                oneOf:
+                - not:
+                    required:
+                    - external
+                  required:
+                  - name
+                - not:
+                    anyOf:
+                    - required:
+                      - name
+                    - required:
+                      - namespace
+                  required:
+                  - external
+                properties:
+                  external:
+                    description: The `projectID` field of a project, when not managed
+                      by Config Connector.
+                    type: string
+                  kind:
+                    description: The kind of the Project resource; optional but must
+                      be `Project` if provided.
+                    type: string
+                  name:
+                    description: The `name` field of a `Project` resource.
+                    type: string
+                  namespace:
+                    description: The `namespace` field of a `Project` resource.
+                    type: string
+                type: object
             type: object
           status:
             description: KMSAutokeyConfigStatus defines the config connector machine
