@@ -61,13 +61,6 @@ spec:
           spec:
             description: CloudDeployTargetSpec defines the desired state of CloudDeployTarget
             properties:
-              annotations:
-                additionalProperties:
-                  type: string
-                description: Optional. User annotations. These attributes can only
-                  be set and used by the user, and not by Cloud Deploy. See https://google.aip.dev/128#annotations
-                  for more details such as format and size limitations.
-                type: object
               anthosCluster:
                 description: Information specifying an Anthos Cluster.
                 properties:
@@ -202,14 +195,15 @@ spec:
                       - external
                     properties:
                       external:
-                        description: A reference to an externally managed DeployCustomTargetType
+                        description: A reference to an externally managed CloudDeployCustomTargetType
                           resource. Should be in the format "projects/{{projectID}}/locations/{{location}}/customtargettypes/{{customtargettypeID}}".
                         type: string
                       name:
-                        description: The name of a DeployCustomTargetType resource.
+                        description: The name of a CloudDeployCustomTargetType resource.
                         type: string
                       namespace:
-                        description: The namespace of a DeployCustomTargetType resource.
+                        description: The namespace of a CloudDeployCustomTargetType
+                          resource.
                         type: string
                     type: object
                 type: object

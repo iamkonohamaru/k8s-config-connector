@@ -105,21 +105,3 @@ func ParameterManagerParameterVersionSpec_ToProto(mapCtx *direct.MapContext, in 
 	out.Payload = ParameterVersionPayload_ToProto(mapCtx, in.Payload)
 	return out
 }
-func ParameterVersionPayload_FromProto(mapCtx *direct.MapContext, in *pb.ParameterVersionPayload) *krm.ParameterVersionPayload {
-	if in == nil {
-		return nil
-	}
-	out := &krm.ParameterVersionPayload{}
-	out.Data = []krm.byte{direct.LazyPtr(in.GetData())}
-	return out
-}
-func ParameterVersionPayload_ToProto(mapCtx *direct.MapContext, in *krm.ParameterVersionPayload) *pb.ParameterVersionPayload {
-	if in == nil {
-		return nil
-	}
-	out := &pb.ParameterVersionPayload{}
-	if len(in.Data) > 0 && in.Data[0] != nil {
-		out.Data = direct.ValueOf(in.Data[0])
-	}
-	return out
-}

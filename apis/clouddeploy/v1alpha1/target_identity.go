@@ -20,18 +20,15 @@ import (
 	"strings"
 
 	"github.com/GoogleCloudPlatform/k8s-config-connector/apis/common"
-	"github.com/GoogleCloudPlatform/k8s-config-connector/apis/common/identity"
-	"github.com/GoogleCloudPlatform/k8s-config-connector/apis/common/parent"
 	refsv1beta1 "github.com/GoogleCloudPlatform/k8s-config-connector/apis/refs/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-var _ identity.Identity = &CloudDeployTargetIdentity{}
-
 // CloudDeployTargetIdentity defines the resource reference to CloudDeployTarget, which "External" field
 // holds the GCP identifier for the KRM object.
+// +k8s:deepcopy-gen=false
 type CloudDeployTargetIdentity struct {
-	parent *parent.ProjectAndLocationParent
+	parent *CloudDeployTargetParent
 	id     string
 }
 
@@ -43,26 +40,21 @@ func (i *CloudDeployTargetIdentity) ID() string {
 	return i.id
 }
 
-func (i *CloudDeployTargetIdentity) Parent() *parent.ProjectAndLocationParent {
+func (i *CloudDeployTargetIdentity) Parent() *CloudDeployTargetParent {
 	return i.parent
 }
 
-func (i *CloudDeployTargetIdentity) FromExternal(external string) error {
-	tokens := strings.Split(external, "/")
-	if len(tokens) != 6 || tokens[0] != "projects" || tokens[2] != "locations" || tokens[4] != "targets" {
-		return fmt.Errorf("format of CloudDeployTarget external=%q was not known (use projects/{{projectID}}/locations/{{location}}/targets/{{targetID}})", external)
-	}
-	i.parent = &parent.ProjectAndLocationParent{
-		ProjectID: tokens[1],
-		Location:  tokens[3],
-	}
-	i.id = tokens[5]
-	return nil
+type CloudDeployTargetParent struct {
+	ProjectID string
+	Location  string
 }
 
-var _ identity.Resource = &CloudDeployTarget{}
+func (p *CloudDeployTargetParent) String() string {
+	return "projects/" + p.ProjectID + "/locations/" + p.Location
+}
 
-func (obj *CloudDeployTarget) GetIdentity(ctx context.Context, reader client.Reader) (identity.Identity, error) {
+// NewCloudDeployTargetIdentity builds a CloudDeployTargetIdentity from the Config Connector CloudDeployTarget object.
+func NewCloudDeployTargetIdentity(ctx context.Context, reader client.Reader, obj *CloudDeployTarget) (*CloudDeployTargetIdentity, error) {
 
 	// Get Parent
 	projectRef, err := refsv1beta1.ResolveProject(ctx, reader, obj.GetNamespace(), obj.Spec.ProjectRef)
@@ -91,26 +83,39 @@ func (obj *CloudDeployTarget) GetIdentity(ctx context.Context, reader client.Rea
 	externalRef := common.ValueOf(obj.Status.ExternalRef)
 	if externalRef != "" {
 		// Validate desired with actual
-		actualIdentity := &CloudDeployTargetIdentity{}
-		if err := actualIdentity.FromExternal(externalRef); err != nil {
+		actualParent, actualResourceID, err := ParseCloudDeployTargetExternal(externalRef)
+		if err != nil {
 			return nil, err
 		}
-		if actualIdentity.Parent().ProjectID != projectID {
-			return nil, fmt.Errorf("spec.projectRef changed, expect %s, got %s", actualIdentity.Parent().ProjectID, projectID)
+		if actualParent.ProjectID != projectID {
+			return nil, fmt.Errorf("spec.projectRef changed, expect %s, got %s", actualParent.ProjectID, projectID)
 		}
-		if actualIdentity.Parent().Location != location {
-			return nil, fmt.Errorf("spec.location changed, expect %s, got %s", actualIdentity.Parent().Location, location)
+		if actualParent.Location != location {
+			return nil, fmt.Errorf("spec.location changed, expect %s, got %s", actualParent.Location, location)
 		}
-		if actualIdentity.ID() != resourceID {
+		if actualResourceID != resourceID {
 			return nil, fmt.Errorf("cannot reset `metadata.name` or `spec.resourceID` to %s, since it has already assigned to %s",
-				resourceID, actualIdentity.ID())
+				resourceID, actualResourceID)
 		}
 	}
 	return &CloudDeployTargetIdentity{
-		parent: &parent.ProjectAndLocationParent{
+		parent: &CloudDeployTargetParent{
 			ProjectID: projectID,
 			Location:  location,
 		},
 		id: resourceID,
 	}, nil
+}
+
+func ParseCloudDeployTargetExternal(external string) (parent *CloudDeployTargetParent, resourceID string, err error) {
+	tokens := strings.Split(external, "/")
+	if len(tokens) != 6 || tokens[0] != "projects" || tokens[2] != "locations" || tokens[4] != "targets" {
+		return nil, "", fmt.Errorf("format of CloudDeployTarget external=%q was not known (use projects/{{projectID}}/locations/{{location}}/targets/{{targetID}})", external)
+	}
+	parent = &CloudDeployTargetParent{
+		ProjectID: tokens[1],
+		Location:  tokens[3],
+	}
+	resourceID = tokens[5]
+	return parent, resourceID, nil
 }

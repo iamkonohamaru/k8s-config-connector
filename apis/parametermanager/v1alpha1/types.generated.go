@@ -22,6 +22,13 @@
 
 package v1alpha1
 
+// +kcc:proto=google.cloud.parametermanager.v1.ParameterVersionPayload
+type ParameterVersionPayload struct {
+	// Required. bytes data for storing payload.
+	// +kcc:proto:field=google.cloud.parametermanager.v1.ParameterVersionPayload.data
+	Data []byte `json:"data,omitempty"`
+}
+
 // +kcc:proto=google.iam.v1.ResourcePolicyMember
 type ResourcePolicyMember struct {
 }
